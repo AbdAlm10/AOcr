@@ -1,0 +1,35 @@
+[project]
+name = "aocr"
+version = "1.0.0"
+description = "Self-hosted AOcr desk for Chandra OCR: local GPU inference, with a Datalab API fallback."
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+  "beautifulsoup4>=4.12",
+  "chandra-ocr>=0.2.0",
+  "fastapi>=0.115",
+  "httpx>=0.27",
+  "pillow>=10.2",
+  "pydantic-settings>=2.6",
+  "pypdfium2>=4.30",
+  "python-multipart>=0.0.12",
+  "uvicorn>=0.32",
+]
+
+[project.optional-dependencies]
+hf = ["chandra-ocr[hf]"]
+dev = ["pytest>=8.3", "httpx>=0.27"]
+
+[project.scripts]
+aocr = "waraq.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["waraq*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

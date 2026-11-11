@@ -1,0 +1,90 @@
+services:
+  api:
+    build: ./server
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATA_DIR: /data
+      HOST: 0.0.0.0
+      PORT: "8791"
+      WEB_PORT: "8787"
+      CHANDRA_ENGINE: ${CHANDRA_ENGINE:-auto}
+      DATALAB_API_KEY: ${DATALAB_API_KEY:-}
+      VLLM_API_BASE: ${VLLM_API_BASE:-http://vllm:8000/v1}
+      VLLM_MODEL_NAME: ${VLLM_MODEL_NAME:-chandra}
+      MODEL_CHECKPOINT: ${MODEL_CHECKPOINT:-datalab-to/chandra-ocr-2}
+      MAX_OUTPUT_TOKENS: ${MAX_OUTPUT_TOKENS:-12384}
+      ACCESS_TOKEN: ${ACCESS_TOKEN:-}
+      ALLOW_CPU: ${ALLOW_CPU:-0}
+      ADVERTISED_HOSTS: ${ADVERTISED_HOSTS:-}
+      MAX_PAGES: ${MAX_PAGES:-5000}
+    volumes:
+      - desk-data:/data
+    expose:
+      - "8791"
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    environment:
+      API_INTERNAL_URL: http://api:8791
+    ports:
+      - "8787:8787"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Best local quality. Needs an NVIDIA GPU, the NVIDIA driver, and
+  # nvidia-container-toolkit. First start downloads about 10 GB of weights.
+  vllm:
+    profiles: ["gpu"]
+    image: vllm/vllm-openai:v0.17.0
+    ipc: host
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    command:
+      - --model
+      - ${MODEL_CHECKPOINT:-datalab-to/chandra-ocr-2}
+      - --served-model-name
+      - chandra
+      - --dtype
+      - bfloat16
+      - --max-model-len
+      - ${VLLM_MAX_MODEL_LEN:-18000}
+      - --max-num-seqs
+      - "8"
+      - --max-num-batched-tokens
+      - "2048"
+      - --gpu-memory-utilization
+      - "0.85"
+      - --no-enforce-eager
+      - --enable-prefix-caching
+      - --mm-processor-kwargs
+      - '{"min_pixels": 3136, "max_pixels": 6291456}'
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 40
+      start_period: 900s
+    restart: unless-stopped
+
+volumes:
+  desk-data:
+  hf-cache:

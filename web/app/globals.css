@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  font-family: var(--font-plex), var(--font-plex-ar), "Noto Naskh Arabic", "Noto Sans Arabic",
+    "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+a {
+  font: inherit;
+}
+
+::selection {
+  background: #d6e8ff;
+}
+
+.reading {
+  font-size: 16.5px;
+  line-height: 1.7;
+}
+
+.reading h1,
+.reading h2,
+.reading h3 {
+  margin: 0.2rem 0 0.7rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+.reading h1 {
+  font-size: 1.7rem;
+}
+
+.reading p {
+  margin: 0.65rem 0;
+}
+
+.reading table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.reading th,
+.reading td {
+  border: 1px solid #e6e6ea;
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+.reading th {
+  background: #f5f5f7;
+  font-weight: 600;
+}
+
+.reading img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.reading ul,
+.reading ol {
+  margin: 0.6rem 0;
+  padding-inline-start: 1.25rem;
+}
+
+.reading math,
+.reading [data-label="Equation-Block"] {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+.reading math[display="block"] {
+  display: block;
+  margin: 1rem 0;
+  font-size: 1.2rem;
+}

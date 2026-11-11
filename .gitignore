@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.eggs/
+data/
+.env
+web/node_modules/
+.next/
+web/.next/
+web/tsconfig.tsbuildinfo
+agent-tools/
+*.log
