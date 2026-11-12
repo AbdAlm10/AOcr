@@ -161,17 +161,18 @@ def create_app(settings: Settings | None = None, engine_factory=None) -> FastAPI
         meta = _read_meta(settings, upload_id)
         folder = _upload_dir(settings, upload_id)
         assembled = folder / "document"
+        # Validate every chunk before opening the output: Windows cannot unlink
+        # a file that is still open, so failing mid-write would leak a 500.
+        parts = [folder / "chunks" / f"{index}.part" for index in range(meta["parts"])]
+        for index, part in enumerate(parts):
+            if not part.exists():
+                raise HTTPException(status_code=400, detail=f"Missing chunk {index}.")
+            if index < meta["parts"] - 1 and part.stat().st_size != meta["chunk_size"]:
+                raise HTTPException(status_code=400, detail=f"Chunk {index} is the wrong size.")
         written = 0
         with assembled.open("wb") as handle:
-            for index in range(meta["parts"]):
-                part = folder / "chunks" / f"{index}.part"
-                if not part.exists():
-                    assembled.unlink(missing_ok=True)
-                    raise HTTPException(status_code=400, detail=f"Missing chunk {index}.")
+            for part in parts:
                 blob = part.read_bytes()
-                if index < meta["parts"] - 1 and len(blob) != meta["chunk_size"]:
-                    assembled.unlink(missing_ok=True)
-                    raise HTTPException(status_code=400, detail=f"Chunk {index} is the wrong size.")
                 handle.write(blob)
                 written += len(blob)
         if written != meta["size"]:

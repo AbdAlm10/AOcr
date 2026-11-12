@@ -92,3 +92,10 @@ export const messages = {
       `نقرأ الصفحة ${Math.min(done + 1, Math.max(total, 1))} من ${total || "…"}`,
   },
 } as const;
+
+type English = (typeof messages)["en"];
+
+/** Copy for one language: same keys as English, with plain string values. */
+export type UiCopy = {
+  readonly [K in keyof English]: English[K] extends string ? string : English[K];
+};

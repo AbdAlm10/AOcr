@@ -17,7 +17,10 @@ $env:API_INTERNAL_URL = "http://127.0.0.1:$($env:PORT)"
 if (-not (Test-Path .venv)) { python -m venv .venv }
 & .\.venv\Scripts\python -m pip install -q -U pip
 & .\.venv\Scripts\python -m pip install -q -e ./server
-if (-not (Test-Path web\node_modules)) { npm install --prefix web }
+if (-not (Test-Path web\node_modules)) {
+  Push-Location web
+  try { npm install } finally { Pop-Location }
+}
 
 Write-Host ""
 Write-Host "  On this PC:    http://127.0.0.1:$($env:WEB_PORT)"

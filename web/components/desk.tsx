@@ -20,7 +20,7 @@ import {
   setToken,
   uploadFile,
 } from "@/lib/api";
-import { messages, type Lang } from "@/lib/i18n";
+import { messages, type UiCopy, type Lang } from "@/lib/i18n";
 import { htmlFragment, readingDirection } from "@/lib/utils";
 
 type Scope = "page" | "document";
@@ -477,7 +477,7 @@ function Dropzone({
   onFiles,
   onSample,
 }: {
-  copy: (typeof messages)["en"];
+  copy: UiCopy;
   dragging: boolean;
   setDragging: (value: boolean) => void;
   uploadFraction: number | null;
@@ -568,7 +568,7 @@ function Workspace({
   onBack,
   onCancel,
 }: {
-  copy: (typeof messages)["en"];
+  copy: UiCopy;
   job: Job;
   pageIndex: number;
   setPageIndex: (index: number) => void;
